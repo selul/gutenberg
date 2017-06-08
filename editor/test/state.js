@@ -974,6 +974,18 @@ describe( 'state', () => {
 			expect( store.getState ).to.be.a( 'function' );
 		} );
 
+		it( 'should return same state on unhandled action', () => {
+			// If you're here investigating why tests are failing, you should
+			// ensure that your reducer is not returning a new state object if
+			// it's not handling the action (i.e. that nothing has changed)
+			const store = createReduxStore();
+			const originalState = store.getState();
+
+			store.dispatch( { type: '__UNHANDLED' } );
+
+			expect( store.getState() ).to.equal( originalState );
+		} );
+
 		it( 'should have expected reducer keys', () => {
 			const store = createReduxStore();
 			const state = store.getState();
