@@ -215,7 +215,7 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
-}, { resetTypes: [ 'RESET_BLOCKS' ] } );
+}, { resetTypes: [ 'RESET_BLOCKS', 'SETUP_NEW_POST' ] } );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
