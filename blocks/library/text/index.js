@@ -6,12 +6,12 @@ import { Children, cloneElement } from 'element';
 /**
  * Internal dependencies
  */
-import { registerBlockType, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, query as hpq } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
-const { children } = query;
+const { children, query } = hpq;
 
 registerBlockType( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
@@ -21,7 +21,7 @@ registerBlockType( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: children(),
+		content: query( 'p', children() ),
 	},
 
 	merge( attributes, attributesToMerge ) {
@@ -45,6 +45,8 @@ registerBlockType( 'core/text', {
 				</BlockControls>
 			),
 			<Editable
+				inline
+				tagName="p"
 				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
