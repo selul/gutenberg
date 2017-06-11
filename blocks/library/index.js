@@ -11,5 +11,6 @@ import './pullquote';
 import './table';
 import './preformatted';
 import './code';
+import './code-mirror';
 import './gallery';
 import './latest-posts';
