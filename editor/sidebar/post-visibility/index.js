@@ -26,7 +26,9 @@ class PostVisibility extends Component {
 		super( ...arguments );
 
 		this.toggleDialog = this.toggleDialog.bind( this );
-		this.setVisibility = this.setVisibility.bind( this );
+		this.setPublic = this.setPublic.bind( this );
+		this.setPrivate = this.setPrivate.bind( this );
+		this.setPasswordProtected = this.setPasswordProtected.bind( this );
 
 		this.state = {
 			opened: false,
@@ -39,31 +41,30 @@ class PostVisibility extends Component {
 		this.setState( { opened: ! this.state.opened } );
 	}
 
-	setVisibility( event ) {
-		const { visibility, onUpdateVisibility, status, password, onSave } = this.props;
-		const nextVisibility = event.currentTarget.value;
+	setPublic() {
+		const { visibility, onUpdateVisibility, status } = this.props;
 
-		switch ( nextVisibility ) {
-			case 'public':
-				onUpdateVisibility( visibility === 'private' ? 'draft' : status );
-				this.setState( { hasPassword: false } );
-				break;
+		onUpdateVisibility( visibility === 'private' ? 'draft' : status );
+		this.setState( { hasPassword: false } );
+	}
 
-			case 'private':
-				if ( ! window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) { // eslint-disable-line no-alert
-					return;
-				}
-
-				onUpdateVisibility( 'private' );
-				onSave();
-				this.setState( { opened: false } );
-				break;
-
-			case 'password':
-				onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
-				this.setState( { hasPassword: true } );
-				break;
+	setPrivate() {
+		if ( ! window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) { // eslint-disable-line no-alert
+			return;
 		}
+
+		const { onUpdateVisibility, onSave } = this.props;
+
+		onUpdateVisibility( 'private' );
+		onSave();
+		this.setState( { opened: false } );
+	}
+
+	setPasswordProtected() {
+		const { visibility, onUpdateVisibility, status, password } = this.props;
+
+		onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
+		this.setState( { hasPassword: true } );
 	}
 
 	handleClickOutside() {
@@ -80,18 +81,21 @@ class PostVisibility extends Component {
 				value: 'public',
 				label: __( 'Public' ),
 				info: __( 'Visible to everyone.' ),
+				onSelect: this.setPublic,
 				checked: visibility === 'public' && ! this.state.hasPassword,
 			},
 			{
 				value: 'private',
 				label: __( 'Private' ),
 				info: __( 'Only visible to site admins and editors.' ),
+				onSelect: this.setPrivate,
 				checked: visibility === 'private',
 			},
 			{
 				value: 'password',
 				label: __( 'Password Protected' ),
 				info: __( 'Protected with a password you choose. Only those with the password can view this post.' ),
+				onSelect: this.setPasswordProtected,
 				checked: this.state.hasPassword,
 			},
 		];
@@ -112,12 +116,12 @@ class PostVisibility extends Component {
 						<div className="editor-post-visibility__dialog-legend">
 							{ __( 'Post Visibility' ) }
 						</div>
-						{ visibilityOptions.map( ( { value, label, info, checked } ) => (
+						{ visibilityOptions.map( ( { value, label, info, onSelect, checked } ) => (
 							<label key={ value } className="editor-post-visibility__dialog-label">
 								<input
 									type="radio"
 									value={ value }
-									onChange={ this.setVisibility }
+									onChange={ onSelect }
 									checked={ checked } />
 								{ label }
 								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
