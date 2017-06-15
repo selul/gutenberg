@@ -9,6 +9,7 @@ import { __ } from 'i18n';
  */
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
+import InspectorControls from '../../inspector-controls';
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -104,15 +105,22 @@ registerBlockType( 'core/latestposts', {
 				);
 			}
 
-			return (
-				<div className="blocks-latest-posts">
+			const { focus } = this.props;
+
+			return [
+				focus && (
+					<InspectorControls key="inspector">
+
+					</InspectorControls>
+				),
+				<div className="blocks-latest-posts" key="latest-posts">
 					<ul>
 						{ latestPosts.map( ( post, i ) =>
 							<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
 						) }
 					</ul>
-				</div>
-			);
+				</div>,
+			];
 		}
 
 		componentWillUnmount() {
