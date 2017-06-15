@@ -10,6 +10,20 @@ import { __ } from 'i18n';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 
+/**
+ * Returns an attribute setter with behavior that if the target value is
+ * already the assigned attribute value, it will be set to undefined.
+ *
+ * @param  {string}   align Alignment value
+ * @return {Function}       Attribute setter
+ */
+function toggleAlignment( align ) {
+	return ( attributes, setAttributes ) => {
+		const nextAlign = attributes.align === align ? undefined : align;
+		setAttributes( { align: nextAlign } );
+	};
+}
+
 registerBlockType( 'core/latestposts', {
 	title: __( 'Latest Posts' ),
 
@@ -19,6 +33,46 @@ registerBlockType( 'core/latestposts', {
 
 	defaultAttributes: {
 		poststoshow: 5,
+	},
+
+	controls: [
+		{
+			icon: 'align-left',
+			title: __( 'Align left' ),
+			isActive: ( { align } ) => 'left' === align,
+			onClick: toggleAlignment( 'left' ),
+		},
+		{
+			icon: 'align-center',
+			title: __( 'Align center' ),
+			isActive: ( { align } ) => ! align || 'center' === align,
+			onClick: toggleAlignment( 'center' ),
+		},
+		{
+			icon: 'align-right',
+			title: __( 'Align right' ),
+			isActive: ( { align } ) => 'right' === align,
+			onClick: toggleAlignment( 'right' ),
+		},
+		{
+			icon: 'align-wide',
+			title: __( 'Wide width' ),
+			isActive: ( { align } ) => 'wide' === align,
+			onClick: toggleAlignment( 'wide' ),
+		},
+		{
+			icon: 'align-full-width',
+			title: __( 'Full width' ),
+			isActive: ( { align } ) => 'full' === align,
+			onClick: toggleAlignment( 'full' ),
+		},
+	],
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
 	},
 
 	edit: class extends wp.element.Component {
