@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Placeholder } from 'components';
+import { Placeholder, FormToggle } from 'components';
 import { __ } from 'i18n';
 
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
@@ -34,6 +35,7 @@ registerBlockType( 'core/latestposts', {
 
 	defaultAttributes: {
 		poststoshow: 5,
+		displayPostDate: false,
 	},
 
 	controls: [
@@ -80,16 +82,25 @@ registerBlockType( 'core/latestposts', {
 		constructor() {
 			super( ...arguments );
 
-			const { poststoshow } = this.props.attributes;
+			const { poststoshow, displayPostDate } = this.props.attributes;
 
 			this.state = {
 				latestPosts: [],
 			};
 
-			this.latestPostsRequest = getLatestPosts( poststoshow );
+			this.latestPostsRequest = getLatestPosts( poststoshow, displayPostDate );
 
 			this.latestPostsRequest
 				.then( latestPosts => this.setState( { latestPosts } ) );
+
+			this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
+		}
+
+		toggleDisplayPostDate() {
+			const { displayPostDate } = this.props.attributes;
+			const { setAttributes } = this.props;
+
+			setAttributes( { displayPostDate: ! displayPostDate } );
 		}
 
 		render() {
@@ -106,11 +117,22 @@ registerBlockType( 'core/latestposts', {
 			}
 
 			const { focus } = this.props;
+			const { displayPostDate } = this.props.attributes;
+
+			const displayPostDateId = 'post-date-toggle';
 
 			return [
 				focus && (
 					<InspectorControls key="inspector">
-
+						<div className="editor-latest-posts__row">
+							<label htmlFor={ displayPostDateId }>{ __( 'Display post date?' ) }</label>
+							<FormToggle
+								id={ displayPostDateId }
+								checked={ displayPostDate }
+								onChange={ this.toggleDisplayPostDate }
+								showHint={ false }
+							/>
+						</div>
 					</InspectorControls>
 				),
 				<div className="blocks-latest-posts" key="latest-posts">
